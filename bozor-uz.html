@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xavfsiz Bozor — Xavfsiz va Ishonchli Savdo</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #1a8a4a;
+    --green-light: #25b85f;
+    --green-dark: #0f5c30;
+    --gold: #f5a623;
+    --gold-light: #ffd166;
+    --bg: #f7f9f5;
+    --white: #ffffff;
+    --text: #1a2a1e;
+    --text-muted: #6b8070;
+    --card-bg: #ffffff;
+    --border: #d8e8dc;
+    --shadow: 0 4px 24px rgba(26,138,74,0.10);
+    --shadow-lg: 0 8px 40px rgba(26,138,74,0.18);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ===== NAVBAR ===== */
+  nav {
+    background: var(--green-dark);
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+  }
+
+  .logo {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--gold);
+    letter-spacing: -1px;
+  }
+  .logo span { color: #fff; }
+
+  .nav-search {
+    flex: 1;
+    max-width: 420px;
+    margin: 0 24px;
+    display: flex;
+    background: rgba(255,255,255,0.12);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1.5px solid rgba(255,255,255,0.18);
+  }
+  .nav-search input {
+    flex: 1;
+    padding: 10px 16px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+  }
+  .nav-search input::placeholder { color: rgba(255,255,255,0.55); }
+  .nav-search button {
+    padding: 10px 18px;
+    background: var(--gold);
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background 0.2s;
+  }
+  .nav-search button:hover { background: var(--gold-light); }
+
+  .nav-btns { display: flex; gap: 10px; align-items: center; }
+  .btn-nav {
+    padding: 8px 18px;
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+  .btn-login {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border: 1.5px solid rgba(255,255,255,0.3);
+  }
+  .btn-login:hover { background: rgba(255,255,255,0.25); }
+  .btn-post {
+    background: var(--gold);
+    color: var(--green-dark);
+  }
+  .btn-post:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  /* ===== HERO ===== */
+  .hero {
+    background: linear-gradient(135deg, var(--green-dark) 0%, var(--green) 60%, #2ec96b 100%);
+    padding: 48px 20px 56px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 280px; height: 280px;
+    background: rgba(245,166,35,0.13);
+    border-radius: 50%;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -40px;
+    width: 220px; height: 220px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50%;
+  }
+  .hero h1 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .hero h1 span { color: var(--gold); }
+  .hero p {
+    color: rgba(255,255,255,0.8);
+    font-size: 1.05rem;
+    margin-bottom: 28px;
+  }
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+    position: relative;
+  }
+  .stat {
+    background: rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 12px 24px;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .stat-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--gold);
+  }
+  .stat-label { color: rgba(255,255,255,0.75); font-size: 0.82rem; }
+
+  /* ===== CATEGORIES ===== */
+  .section { padding: 32px 20px; max-width: 1100px; margin: 0 auto; }
+  .section-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--green-dark);
+    margin-bottom: 18px;
+  }
+
+  .categories {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .cat-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: var(--white);
+    border-radius: 14px;
+    border: 2px solid var(--border);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text);
+    transition: all 0.2s;
+  }
+  .cat-pill:hover, .cat-pill.active {
+    border-color: var(--green);
+    background: var(--green);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+  .cat-pill .icon { font-size: 1.2rem; }
+
+  /* ===== LISTINGS ===== */
+  .listings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+    margin-top: 4px;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1.5px solid var(--border);
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: all 0.25s;
+    animation: fadeUp 0.4s ease both;
+  }
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--green-light);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    background: linear-gradient(135deg, #e8f5ec, #c8e6d0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    position: relative;
+  }
+  .card-badge {
+    position: absolute;
+    top: 12px; left: 12px;
+    background: var(--gold);
+    color: var(--green-dark);
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .card-body { padding: 16px; }
+  .card-price {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 4px;
+  }
+  .card-title {
+    font-weight: 700;
+    font-size: 0.97rem;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+  }
+  .card-location {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .card-time {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .card-fav {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: rgba(255,255,255,0.9);
+    border: none;
+    border-radius: 50%;
+    width: 34px; height: 34px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  }
+  .card-fav:hover { transform: scale(1.15); }
+  .card-fav.liked { color: #e74c3c; }
+
+  /* ===== POST MODAL ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 32px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.85); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .modal h2 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.2rem;
+    color: var(--green-dark);
+    margin-bottom: 24px;
+  }
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block;
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border 0.2s;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color: var(--green); background: #fff; }
+  .form-group textarea { height: 90px; resize: none; }
+
+  .emoji-upload {
+    border: 2px dashed var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    background: var(--bg);
+    transition: all 0.2s;
+  }
+  .emoji-upload:hover { border-color: var(--green); background: #edfaf2; }
+  .emoji-upload .upload-icon { font-size: 2.5rem; margin-bottom: 8px; }
+  .emoji-upload p { color: var(--text-muted); font-size: 0.88rem; }
+
+  .modal-btns { display: flex; gap: 12px; margin-top: 20px; }
+  .btn-cancel {
+    flex: 1;
+    padding: 13px;
+    border-radius: 12px;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.2s;
+  }
+  .btn-cancel:hover { border-color: var(--green); }
+  .btn-submit {
+    flex: 2;
+    padding: 13px;
+    border-radius: 12px;
+    background: var(--green);
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-submit:hover { background: var(--green-light); transform: translateY(-1px); }
+
+  /* ===== DETAIL MODAL ===== */
+  .detail-modal {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 0;
+    width: 90%;
+    max-width: 540px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .detail-img {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(135deg, #e8f5ec, #c8e6d0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    border-radius: 24px 24px 0 0;
+  }
+  .detail-body { padding: 24px; }
+  .detail-price {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--green);
+    margin-bottom: 6px;
+  }
+  .detail-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .detail-desc { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 16px; }
+  .detail-seller {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    background: var(--bg);
+    border-radius: 14px;
+    margin-bottom: 16px;
+  }
+  .seller-avatar {
+    width: 44px; height: 44px;
+    background: var(--green);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    color: white;
+    font-weight: 700;
+  }
+  .seller-name { font-weight: 700; font-size: 0.95rem; }
+  .seller-rating { font-size: 0.82rem; color: var(--gold); }
+  .btn-contact {
+    width: 100%;
+    padding: 14px;
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-contact:hover { background: var(--green-light); transform: translateY(-2px); }
+  .close-btn {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: rgba(255,255,255,0.9);
+    border: none;
+    border-radius: 50%;
+    width: 36px; height: 36px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: all 0.2s;
+  }
+  .close-btn:hover { transform: scale(1.1); }
+
+  /* ===== SUCCESS TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--green-dark);
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 14px;
+    font-weight: 700;
+    z-index: 999;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ===== EMPTY STATE ===== */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+  }
+  .empty-state .empty-icon { font-size: 3.5rem; margin-bottom: 16px; }
+  .empty-state p { font-size: 1rem; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    background: var(--green-dark);
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    padding: 24px;
+    font-size: 0.85rem;
+    margin-top: 40px;
+  }
+  footer span { color: var(--gold); font-weight: 700; }
+
+  @media (max-width: 600px) {
+    .nav-search { max-width: 180px; }
+    .hero h1 { font-size: 1.4rem; }
+    .hero-stats { gap: 12px; }
+    .stat { padding: 10px 16px; }
+    .listings-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="logo">Xavfsiz Bozor</div>
+  <div class="nav-search">
+    <input type="text" id="searchInput" placeholder="Nimani qidiryapsiz?" oninput="filterListings()">
+    <button>🔍</button>
+  </div>
+  <div class="nav-btns">
+    <button class="btn-nav btn-login" onclick="window.location.href='bozor-auth.html'">Kirish</button>
+    <button class="btn-nav btn-post" onclick="openPostModal()">+ E'lon</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>O'zbekistondagi <span>eng yaxshi</span> mahalliy bozor</h1>
+  <p>Soting. Xarid qiling. Mahallangizda.</p>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num" id="statListings">0</div>
+      <div class="stat-label">E'lonlar</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">14</div>
+      <div class="stat-label">Viloyat</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">⭐ 4.8</div>
+      <div class="stat-label">Reyting</div>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<div class="section">
+  <div class="section-title">Kategoriyalar</div>
+  <div class="categories">
+    <div class="cat-pill active" onclick="filterCat('barchasi', this)"><span class="icon">🏪</span> Barchasi</div>
+    <div class="cat-pill" onclick="filterCat('elektronika', this)"><span class="icon">📱</span> Elektronika</div>
+    <div class="cat-pill" onclick="filterCat('kiyim', this)"><span class="icon">👗</span> Kiyim-kechak</div>
+    <div class="cat-pill" onclick="filterCat('uy', this)"><span class="icon">🏠</span> Uy-ro'zg'or</div>
+    <div class="cat-pill" onclick="filterCat('mashina', this)"><span class="icon">🚗</span> Avtomobil</div>
+    <div class="cat-pill" onclick="filterCat('oziq', this)"><span class="icon">🥗</span> Oziq-ovqat</div>
+    <div class="cat-pill" onclick="filterCat('sport', this)"><span class="icon">⚽</span> Sport</div>
+    <div class="cat-pill" onclick="filterCat('boshqa', this)"><span class="icon">📦</span> Boshqa</div>
+  </div>
+</div>
+
+<!-- LISTINGS -->
+<div class="section" style="padding-top: 0;">
+  <div class="section-title">So'nggi e'lonlar</div>
+  <div class="listings-grid" id="listingsGrid"></div>
+</div>
+
+<!-- POST MODAL -->
+<div class="modal-overlay" id="postModal">
+  <div class="modal">
+    <h2>📝 Yangi E'lon Berish</h2>
+    <div class="emoji-upload">
+      <div class="upload-icon">📸</div>
+      <p>Rasm yuklash uchun bosing (Demo: emoji ishlatiladi)</p>
+    </div>
+    <div class="form-group" style="margin-top:16px;">
+      <label>E'lon nomi *</label>
+      <input type="text" id="newTitle" placeholder="Masalan: Samsung Galaxy S23">
+    </div>
+    <div class="form-group">
+      <label>Narx (so'm) *</label>
+      <input type="number" id="newPrice" placeholder="Masalan: 5000000">
+    </div>
+    <div class="form-group">
+      <label>Kategoriya *</label>
+      <select id="newCat">
+        <option value="elektronika">📱 Elektronika</option>
+        <option value="kiyim">👗 Kiyim-kechak</option>
+        <option value="uy">🏠 Uy-ro'zg'or</option>
+        <option value="mashina">🚗 Avtomobil</option>
+        <option value="oziq">🥗 Oziq-ovqat</option>
+        <option value="sport">⚽ Sport</option>
+        <option value="boshqa">📦 Boshqa</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Shahar *</label>
+      <select id="newCity">
+        <option>Toshkent</option>
+        <option>Samarqand</option>
+        <option>Buxoro</option>
+        <option>Andijon</option>
+        <option>Namangan</option>
+        <option>Farg'ona</option>
+        <option>Qashqadaryo</option>
+        <option>Surxondaryo</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Tavsif</label>
+      <textarea id="newDesc" placeholder="Mahsulot haqida batafsil yozing..."></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closePostModal()">Bekor qilish</button>
+      <button class="btn-submit" onclick="submitListing()">✅ E'lon berish</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+  <div class="detail-modal" style="position:relative;">
+    <button class="close-btn" onclick="closeDetailModal()">✕</button>
+    <div class="detail-img" id="detailImg"></div>
+    <div class="detail-body">
+      <div class="detail-price" id="detailPrice"></div>
+      <div class="detail-title" id="detailTitle"></div>
+      <div class="detail-desc" id="detailDesc"></div>
+      <div class="detail-seller">
+        <div class="seller-avatar" id="sellerAvatar"></div>
+        <div>
+          <div class="seller-name" id="sellerName"></div>
+          <div class="seller-rating">⭐ 4.9 • Ishonchli sotuvchi</div>
+        </div>
+      </div>
+      <button class="btn-contact" onclick="contactSeller()">
+        📞 Sotuvchi bilan bog'lanish
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✅ <span id="toastMsg"></span></div>
+
+<footer>
+  <div style="margin-bottom:6px;">© 2024 <span>Xavfsiz Bozor</span> — Xavfsiz va Ishonchli Savdo Platformasi</div>
+  <div>Toshkent, O'zbekiston 🇺🇿</div>
+</footer>
+
+<script>
+  // ===== DATA =====
+  const catEmoji = {
+    elektronika: ['📱','💻','🎧','📷','⌨️','🖥️'],
+    kiyim: ['👗','👔','👟','🧥','👜','🧤'],
+    uy: ['🛋️','🪴','🍳','🛏️','🪑','🖼️'],
+    mashina: ['🚗','🏍️','🚌','🚕','🚙','🛻'],
+    oziq: ['🥗','🍎','🥩','🫐','🍞','🥛'],
+    sport: ['⚽','🏋️','🎾','🏊','🚴','🥊'],
+    boshqa: ['📦','🎁','📚','🧸','🪆','🎨']
+  };
+
+  const sellers = ['Akbar A.','Nodira X.','Jasur M.','Malika T.','Bobur K.','Dilnoza R.'];
+  const cities = ['Toshkent','Samarqand','Buxoro','Andijon','Namangan','Farg'ona'];
+  const times = ['5 daqiqa oldin','22 daqiqa oldin','1 soat oldin','3 soat oldin','Bugun','Kecha'];
+
+  let listings = [
+    { id:1, title:'iPhone 14 Pro Max - 256GB', price:8500000, cat:'elektronika', city:'Toshkent', time:'5 daqiqa oldin', seller:'Akbar A.', desc:'Ideal holat, hech qanday tirnoq yo\'q. Quti va hamma aksessuarlar bor. Muzokaraga tayyorman.', new:true },
+    { id:2, title:'Zara qish palto, L o\'lcham', price:450000, cat:'kiyim', city:'Samarqand', time:'22 daqiqa oldin', seller:'Nodira X.', desc:'Bir mavsumda kiyilgan, a\'lo holat. Qora rang, juda issiq.', new:false },
+    { id:3, title:'IKEA divan - 3 o\'rinlik', price:1200000, cat:'uy', city:'Toshkent', time:'1 soat oldin', seller:'Jasur M.', desc:'2 yil ishlatilgan, lekin juda yaxshi holat. O\'zim olib beraman Toshkent bo\'ylab.', new:false },
+    { id:4, title:'Chevrolet Cobalt 2021', price:105000000, cat:'mashina', city:'Andijon', time:'3 soat oldin', seller:'Bobur K.', desc:'Birinchi egasi, to\'liq jihozlangan, hujjatlar tayyor.', new:true },
+    { id:5, title:'Nike Air Force 1 - 42 razmer', price:320000, cat:'sport', city:'Toshkent', time:'Bugun', seller:'Malika T.', desc:'Original, bir marta kiyilgan, a\'lo holat.', new:false },
+    { id:6, title:'MacBook Pro M2 2023', price:15500000, cat:'elektronika', city:'Farg\'ona', time:'Kecha', seller:'Dilnoza R.', desc:'8GB RAM, 256GB SSD. Kafolat borligida sotiladi.', new:true },
+    { id:7, title:'Gilam 3x4 metr, Buxoro naqshli', price:780000, cat:'uy', city:'Buxoro', time:'Kecha', seller:'Akbar A.', desc:'Haqiqiy Buxoro gilamlari, yangi.', new:false },
+    { id:8, title:'Adidas futbol to\'pi', price:85000, cat:'sport', city:'Namangan', time:'2 kun oldin', seller:'Jasur M.', desc:'Rasmiy o\'lcham, kam ishlatilgan.', new:false },
+  ];
+
+  let currentCat = 'barchasi';
+  let favorites = new Set();
+
+  function getEmoji(cat) {
+    const arr = catEmoji[cat] || catEmoji.boshqa;
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  // ===== SUPABASE =====
+  const SUPABASE_URL = 'https://chfxqekhufgmbuhkshyr.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNoZnhxZWtodWZnbWJ1aGtzaHlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NTA3OTYsImV4cCI6MjA5NDAyNjc5Nn0.yyh3P7g1yNWM_2SdhdubpAtOlsxveReqbVartNBz5HM';
+
+  async function sbFetch(path, method='GET', body=null) {
+    const res = await fetch(SUPABASE_URL + path, {
+      method,
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': method === 'POST' ? 'return=representation' : ''
+      },
+      body: body ? JSON.stringify(body) : null
+    });
+    return res.json();
+  }
+
+  // Load real listings from Supabase
+  async function loadListings() {
+    try {
+      const data = await sbFetch('/rest/v1/listings?select=*&is_active=eq.true&order=created_at.desc');
+      if (data && data.length > 0) {
+        listings = data.map(l => ({
+          id: l.id,
+          title: l.title,
+          price: l.price,
+          cat: l.category || 'boshqa',
+          city: l.city || 'Noma\'lum',
+          time: timeAgo(l.created_at),
+          seller: 'Sotuvchi',
+          desc: l.description || '',
+          new: true
+        }));
+      }
+      renderListings();
+    } catch(e) {
+      renderListings(); // fallback to demo data
+    }
+  }
+
+  function timeAgo(dateStr) {
+    const diff = (Date.now() - new Date(dateStr)) / 1000;
+    if (diff < 60) return 'Hozir';
+    if (diff < 3600) return Math.floor(diff/60) + ' daqiqa oldin';
+    if (diff < 86400) return Math.floor(diff/3600) + ' soat oldin';
+    return Math.floor(diff/86400) + ' kun oldin';
+  }
+
+  function formatPrice(p) {
+    if (p >= 1000000) return (p/1000000).toFixed(1) + ' mln so\'m';
+    return p.toLocaleString() + ' so\'m';
+  }
+
+  function renderListings() {
+    const grid = document.getElementById('listingsGrid');
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    let filtered = listings.filter(l => {
+      const matchCat = currentCat === 'barchasi' || l.cat === currentCat;
+      const matchSearch = !search || l.title.toLowerCase().includes(search) || l.city.toLowerCase().includes(search);
+      return matchCat && matchSearch;
+    });
+
+    document.getElementById('statListings').textContent = listings.length;
+
+    if (filtered.length === 0) {
+      grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+        <div class="empty-icon">🔍</div>
+        <p>Hech narsa topilmadi.<br>Qidiruvni o'zgartirib ko'ring.</p>
+      </div>`;
+      return;
+    }
+
+    grid.innerHTML = filtered.map((l, i) => `
+      <div class="card" style="animation-delay:${i*0.06}s" onclick="openDetail('${l.id}')">
+        <div class="card-img">
+          ${getEmoji(l.cat)}
+          ${l.new ? '<div class="card-badge">Yangi</div>' : ''}
+          <button class="card-fav ${favorites.has(l.id)?'liked':''}" onclick="toggleFav(event,'${l.id}')">
+            ${favorites.has(l.id)?'❤️':'🤍'}
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="card-price">${formatPrice(l.price)}</div>
+          <div class="card-title">${l.title}</div>
+          <div class="card-meta">
+            <span class="card-location">📍 ${l.city}</span>
+            <span class="card-time">${l.time}</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function toggleFav(e, id) {
+    e.stopPropagation();
+    if (favorites.has(id)) favorites.delete(id);
+    else favorites.add(id);
+    renderListings();
+    showToast(favorites.has(id) ? '❤️ Sevimlilarga qo\'shildi!' : '🤍 Sevimlilardan o\'chirildi');
+  }
+
+  function filterCat(cat, el) {
+    currentCat = cat;
+    document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    renderListings();
+  }
+
+  function filterListings() { renderListings(); }
+
+  // ===== POST MODAL =====
+  function openPostModal() {
+    const user = JSON.parse(localStorage.getItem('xb_user') || 'null');
+    if (!user) {
+      showToast('⚠️ Avval tizimga kiring!');
+      setTimeout(() => window.location.href = 'bozor-auth.html', 1500);
+      return;
+    }
+    document.getElementById('postModal').classList.add('open');
+  }
+  function closePostModal() {
+    document.getElementById('postModal').classList.remove('open');
+  }
+
+  async function submitListing() {
+    const title = document.getElementById('newTitle').value.trim();
+    const price = parseInt(document.getElementById('newPrice').value);
+    const cat = document.getElementById('newCat').value;
+    const city = document.getElementById('newCity').value;
+    const desc = document.getElementById('newDesc').value.trim();
+
+    if (!title || !price) {
+      showToast('⚠️ Iltimos, barcha maydonlarni to\'ldiring!');
+      return;
+    }
+
+    const user = JSON.parse(localStorage.getItem('xb_user') || 'null');
+
+    try {
+      const data = await sbFetch('/rest/v1/listings', 'POST', {
+        title, price, category: cat, city,
+        description: desc,
+        user_id: user?.id || null,
+        is_active: true
+      });
+
+      if (data && data[0]) {
+        const newItem = {
+          id: data[0].id,
+          title, price, cat, city,
+          time: 'Hozir',
+          seller: user?.full_name || 'Siz',
+          desc: desc || '',
+          new: true
+        };
+        listings.unshift(newItem);
+        closePostModal();
+        currentCat = 'barchasi';
+        document.querySelectorAll('.cat-pill').forEach((p,i) => p.classList.toggle('active', i===0));
+        renderListings();
+        showToast('🎉 E\'loningiz muvaffaqiyatli joylashtirildi!');
+        document.getElementById('newTitle').value = '';
+        document.getElementById('newPrice').value = '';
+        document.getElementById('newDesc').value = '';
+      }
+    } catch(e) {
+      showToast('❌ Xatolik! Internet aloqasini tekshiring.');
+    }
+  }
+
+  // ===== DETAIL MODAL =====
+  function openDetail(id) {
+    const l = listings.find(x => x.id == id);
+    if (!l) return;
+    document.getElementById('detailImg').textContent = getEmoji(l.cat);
+    document.getElementById('detailPrice').textContent = formatPrice(l.price);
+    document.getElementById('detailTitle').textContent = l.title;
+    document.getElementById('detailDesc').textContent = l.desc;
+    document.getElementById('sellerAvatar').textContent = (l.seller||'S')[0];
+    document.getElementById('sellerName').textContent = (l.seller||'Sotuvchi') + ' • 📍 ' + l.city;
+    document.getElementById('detailModal').classList.add('open');
+  }
+  function closeDetailModal() {
+    document.getElementById('detailModal').classList.remove('open');
+  }
+
+  function contactSeller() {
+    showToast('📞 Sotuvchi bilan bog\'lanish');
+    closeDetailModal();
+  }
+
+  document.getElementById('postModal').addEventListener('click', function(e) {
+    if (e.target === this) closePostModal();
+  });
+  document.getElementById('detailModal').addEventListener('click', function(e) {
+    if (e.target === this) closeDetailModal();
+  });
+
+  // ===== TOAST =====
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // ===== INIT =====
+  loadListings();
+</script>
+</body>
+</html>
