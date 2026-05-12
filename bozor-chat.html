@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xavfsiz Bozor — Xabarlar</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --green:#1a8a4a; --green-dark:#0d5c30; --green-light:#22c55e;
+  --gold:#f5a623; --bg:#f0f7f3; --white:#fff;
+  --text:#0f2318; --muted:#6b8070; --border:#c8ddd0;
+  --shadow:0 4px 24px rgba(13,92,48,0.10);
+  --msg-out:#dcfce7; --msg-in:#fff;
+}
+html, body { height:100%; overflow:hidden; }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); display:flex; flex-direction:column; }
+
+/* ===== VIEWS ===== */
+.view { display:none; flex-direction:column; height:100%; }
+.view.active { display:flex; }
+
+/* ===== NAV ===== */
+.topbar {
+  background:var(--green-dark); padding:0 16px;
+  display:flex; align-items:center; gap:12px;
+  height:60px; flex-shrink:0;
+  box-shadow:0 2px 16px rgba(0,0,0,0.18);
+}
+.logo { font-family:'Unbounded',sans-serif; font-size:1.2rem; font-weight:900; color:var(--gold); }
+.logo span { color:#fff; }
+.topbar-title { font-family:'Unbounded',sans-serif; font-size:0.95rem; font-weight:700; color:#fff; flex:1; }
+.topbar-sub { font-size:0.75rem; color:rgba(255,255,255,0.65); }
+.back-btn { color:rgba(255,255,255,0.85); font-size:1.4rem; cursor:pointer; padding:4px; transition:color 0.2s; flex-shrink:0; }
+.back-btn:hover { color:#fff; }
+.topbar-avatar {
+  width:38px; height:38px; border-radius:50%;
+  background:var(--gold); display:flex; align-items:center; justify-content:center;
+  font-weight:700; font-size:1rem; color:var(--green-dark);
+  border:2px solid rgba(255,255,255,0.3); flex-shrink:0; cursor:pointer;
+}
+.topbar-icon { color:rgba(255,255,255,0.8); font-size:1.2rem; cursor:pointer; transition:color 0.2s; }
+.topbar-icon:hover { color:#fff; }
+.online-dot {
+  width:10px; height:10px; background:#22c55e;
+  border-radius:50%; border:2px solid var(--green-dark);
+  position:absolute; bottom:1px; right:1px;
+}
+.avatar-wrap { position:relative; flex-shrink:0; }
+
+/* ===== CHAT LIST ===== */
+.search-bar {
+  padding:12px 16px; background:var(--white);
+  border-bottom:1px solid var(--border); flex-shrink:0;
+}
+.search-input {
+  width:100%; padding:10px 16px 10px 40px;
+  border:1.5px solid var(--border); border-radius:12px;
+  font-family:'DM Sans',sans-serif; font-size:0.9rem;
+  background:var(--bg); outline:none; transition:all 0.2s;
+  color:var(--text);
+}
+.search-input:focus { border-color:var(--green); background:#fff; }
+.search-wrap { position:relative; }
+.search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted); }
+
+.chat-list { flex:1; overflow-y:auto; background:var(--white); }
+.chat-item {
+  display:flex; align-items:center; gap:12px;
+  padding:14px 16px; border-bottom:1px solid var(--bg);
+  cursor:pointer; transition:background 0.15s; position:relative;
+}
+.chat-item:hover { background:#f9fefb; }
+.chat-item.active-chat { background:#f0fdf4; }
+.chat-item.unread { background:#f9fefb; }
+.ci-avatar {
+  width:50px; height:50px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.3rem; font-weight:700; color:#fff;
+  position:relative;
+}
+.ci-body { flex:1; min-width:0; }
+.ci-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:3px; }
+.ci-name { font-weight:700; font-size:0.92rem; color:var(--text); }
+.ci-time { font-size:0.72rem; color:var(--muted); flex-shrink:0; }
+.ci-bottom { display:flex; justify-content:space-between; align-items:center; }
+.ci-msg { font-size:0.82rem; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:200px; }
+.ci-msg.unread-msg { color:var(--text); font-weight:600; }
+.unread-count {
+  background:var(--green); color:#fff;
+  font-size:0.68rem; font-weight:800;
+  padding:2px 7px; border-radius:10px; flex-shrink:0;
+}
+.ci-product {
+  font-size:0.72rem; color:var(--green);
+  background:#f0fdf4; border:1px solid #bbf7d0;
+  padding:2px 8px; border-radius:6px;
+  margin-top:4px; display:inline-block;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  max-width:100%;
+}
+.verified-mini {
+  font-size:0.65rem; background:rgba(34,197,94,0.15);
+  color:var(--green); padding:1px 6px; border-radius:4px;
+  margin-left:4px;
+}
+
+/* ===== CHAT VIEW ===== */
+.chat-topbar {
+  background:var(--green-dark); padding:0 12px;
+  display:flex; align-items:center; gap:10px;
+  height:64px; flex-shrink:0;
+  box-shadow:0 2px 16px rgba(0,0,0,0.18);
+}
+.chat-user-info { flex:1; min-width:0; }
+.chat-user-name { font-weight:700; font-size:0.95rem; color:#fff; display:flex; align-items:center; gap:6px; }
+.chat-user-status { font-size:0.75rem; color:rgba(255,255,255,0.65); }
+.online-status { color:#86efac; }
+
+/* Product bar */
+.product-bar {
+  background:var(--white); padding:10px 16px;
+  display:flex; align-items:center; gap:12px;
+  border-bottom:2px solid var(--border); flex-shrink:0;
+}
+.product-thumb {
+  width:44px; height:44px; border-radius:10px;
+  background:linear-gradient(135deg,#e8f5ec,#c8e6d0);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.4rem; flex-shrink:0;
+}
+.product-info { flex:1; min-width:0; }
+.product-name { font-weight:700; font-size:0.85rem; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.product-price { font-size:0.78rem; color:var(--green); font-weight:700; }
+.product-action {
+  padding:7px 14px; background:var(--green);
+  color:#fff; border:none; border-radius:10px;
+  font-family:'DM Sans',sans-serif; font-weight:700;
+  font-size:0.78rem; cursor:pointer; transition:all 0.2s; flex-shrink:0;
+}
+.product-action:hover { background:var(--green-dark); }
+
+/* Messages */
+.messages-area {
+  flex:1; overflow-y:auto; padding:16px;
+  display:flex; flex-direction:column; gap:4px;
+  background:var(--bg);
+}
+
+.date-divider {
+  text-align:center; margin:12px 0;
+}
+.date-divider span {
+  background:rgba(107,128,112,0.15);
+  color:var(--muted); font-size:0.72rem; font-weight:600;
+  padding:4px 12px; border-radius:10px;
+}
+
+.msg-wrap { display:flex; flex-direction:column; margin-bottom:2px; }
+.msg-wrap.out { align-items:flex-end; }
+.msg-wrap.in { align-items:flex-start; }
+
+.msg-bubble {
+  max-width:75%; padding:10px 14px;
+  border-radius:18px; position:relative;
+  animation:popMsg 0.2s cubic-bezier(0.34,1.4,0.64,1);
+  word-break:break-word; line-height:1.5;
+  font-size:0.9rem;
+}
+@keyframes popMsg { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
+.msg-wrap.out .msg-bubble {
+  background:var(--msg-out); color:var(--text);
+  border-bottom-right-radius:4px;
+}
+.msg-wrap.in .msg-bubble {
+  background:var(--msg-in); color:var(--text);
+  border-bottom-left-radius:4px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.08);
+}
+.msg-meta {
+  display:flex; align-items:center; gap:4px;
+  font-size:0.68rem; color:var(--muted);
+  margin-top:3px; padding:0 4px;
+}
+.msg-wrap.out .msg-meta { flex-direction:row-reverse; }
+.msg-status { font-size:0.75rem; }
+.msg-status.read { color:var(--green); }
+
+/* Special messages */
+.msg-offer {
+  background:var(--white); border:2px solid var(--gold);
+  border-radius:16px; padding:14px; max-width:75%;
+  animation:popMsg 0.2s cubic-bezier(0.34,1.4,0.64,1);
+}
+.offer-title { font-weight:700; font-size:0.82rem; color:var(--muted); margin-bottom:6px; }
+.offer-price { font-family:'Unbounded',sans-serif; font-size:1.1rem; font-weight:700; color:var(--green); margin-bottom:10px; }
+.offer-btns { display:flex; gap:8px; }
+.offer-accept {
+  flex:1; padding:8px; background:var(--green); color:#fff;
+  border:none; border-radius:10px;
+  font-family:'DM Sans',sans-serif; font-weight:700; font-size:0.82rem;
+  cursor:pointer; transition:all 0.2s;
+}
+.offer-accept:hover { background:var(--green-dark); }
+.offer-decline {
+  flex:1; padding:8px; background:var(--bg); color:var(--text);
+  border:2px solid var(--border); border-radius:10px;
+  font-family:'DM Sans',sans-serif; font-weight:700; font-size:0.82rem;
+  cursor:pointer; transition:all 0.2s;
+}
+.offer-decline:hover { border-color:var(--green); }
+
+/* Typing indicator */
+.typing-indicator {
+  display:none; align-items:center; gap:8px;
+  padding:0 4px; margin-bottom:4px;
+}
+.typing-indicator.show { display:flex; }
+.typing-bubble {
+  background:var(--white); border-radius:18px; border-bottom-left-radius:4px;
+  padding:12px 16px; display:flex; gap:4px; align-items:center;
+  box-shadow:0 1px 4px rgba(0,0,0,0.08);
+}
+.typing-dot {
+  width:7px; height:7px; background:var(--muted);
+  border-radius:50%; animation:typingBounce 1.2s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay:0.2s; }
+.typing-dot:nth-child(3) { animation-delay:0.4s; }
+@keyframes typingBounce {
+  0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)}
+}
+
+/* Input area */
+.input-area {
+  background:var(--white); padding:10px 12px;
+  border-top:1.5px solid var(--border); flex-shrink:0;
+}
+.input-row { display:flex; align-items:flex-end; gap:8px; }
+.input-actions { display:flex; gap:6px; }
+.action-btn {
+  width:38px; height:38px; border-radius:50%;
+  background:var(--bg); border:1.5px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1rem; cursor:pointer; transition:all 0.2s; flex-shrink:0;
+}
+.action-btn:hover { border-color:var(--green); background:#f0fdf4; }
+.msg-input-wrap { flex:1; position:relative; }
+.msg-input {
+  width:100%; padding:10px 16px;
+  border:1.5px solid var(--border); border-radius:20px;
+  font-family:'DM Sans',sans-serif; font-size:0.92rem;
+  color:var(--text); background:var(--bg); outline:none;
+  transition:all 0.2s; resize:none; max-height:100px;
+  line-height:1.4;
+}
+.msg-input:focus { border-color:var(--green); background:#fff; }
+.send-btn {
+  width:42px; height:42px; border-radius:50%;
+  background:linear-gradient(135deg,var(--green-dark),var(--green));
+  border:none; display:flex; align-items:center; justify-content:center;
+  font-size:1.1rem; cursor:pointer; transition:all 0.2s; flex-shrink:0;
+  box-shadow:0 4px 14px rgba(26,138,74,0.3);
+}
+.send-btn:hover { transform:scale(1.08); }
+.send-btn:active { transform:scale(0.95); }
+
+/* Quick replies */
+.quick-replies {
+  display:flex; gap:8px; padding:8px 0 4px;
+  overflow-x:auto; scrollbar-width:none;
+}
+.quick-replies::-webkit-scrollbar { display:none; }
+.qr-btn {
+  padding:6px 14px; background:var(--bg);
+  border:1.5px solid var(--border); border-radius:16px;
+  font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:600;
+  cursor:pointer; white-space:nowrap; transition:all 0.2s; color:var(--text);
+  flex-shrink:0;
+}
+.qr-btn:hover { border-color:var(--green); background:#f0fdf4; color:var(--green); }
+
+/* Offer modal */
+.modal-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.5); z-index:200;
+  align-items:flex-end; justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.open { display:flex; }
+.modal {
+  background:var(--white); border-radius:24px 24px 0 0;
+  padding:24px 20px 40px; width:100%; max-width:500px;
+  animation:slideUp 0.3s cubic-bezier(0.34,1.2,0.64,1);
+}
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.modal-handle { width:40px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 20px; }
+.modal-title { font-family:'Unbounded',sans-serif; font-size:1rem; font-weight:700; color:var(--green-dark); margin-bottom:16px; }
+.price-input-wrap { position:relative; margin-bottom:16px; }
+.price-input {
+  width:100%; padding:16px 70px 16px 16px;
+  border:2px solid var(--border); border-radius:14px;
+  font-family:'Unbounded',sans-serif; font-size:1.2rem; font-weight:700;
+  color:var(--text); background:var(--bg); outline:none; transition:all 0.2s;
+}
+.price-input:focus { border-color:var(--green); background:#fff; }
+.price-suffix { position:absolute; right:16px; top:50%; transform:translateY(-50%); font-weight:700; color:var(--green); font-size:0.85rem; }
+.offer-hint { font-size:0.82rem; color:var(--muted); margin-bottom:20px; }
+.btn-send-offer {
+  width:100%; padding:14px; background:linear-gradient(135deg,var(--green-dark),var(--green));
+  color:#fff; border:none; border-radius:14px;
+  font-family:'DM Sans',sans-serif; font-weight:700; font-size:1rem;
+  cursor:pointer; transition:all 0.2s;
+}
+.btn-send-offer:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(26,138,74,0.35); }
+
+/* ===== CHAT MENU ===== */
+.chat-menu {
+  position:fixed; top:64px; right:12px; z-index:300;
+  background:var(--white); border-radius:16px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.18);
+  border:1.5px solid var(--border);
+  overflow:hidden; min-width:210px;
+  animation:menuPop 0.2s cubic-bezier(0.34,1.4,0.64,1);
+  display:none;
+}
+.chat-menu.open { display:block; }
+@keyframes menuPop { from{opacity:0;transform:scale(0.9) translateY(-8px)} to{opacity:1;transform:scale(1) translateY(0)} }
+.menu-item {
+  display:flex; align-items:center; gap:12px;
+  padding:13px 18px; cursor:pointer;
+  font-size:0.9rem; font-weight:600;
+  transition:background 0.15s; color:var(--text);
+}
+.menu-item:hover { background:var(--bg); }
+.menu-item.danger { color:#e53e3e; }
+.menu-item.danger:hover { background:#fff5f5; }
+.menu-item.warning { color:#d97706; }
+.menu-item.warning:hover { background:#fffbeb; }
+.menu-divider { height:1px; background:var(--border); margin:4px 0; }
+.menu-icon { font-size:1.1rem; flex-shrink:0; }
+
+/* Blocked banner */
+.blocked-banner {
+  background:#fff5f5; border-bottom:2px solid #fecaca;
+  padding:10px 16px; display:none;
+  align-items:center; gap:10px; flex-shrink:0;
+}
+.blocked-banner.show { display:flex; }
+.blocked-banner-text { flex:1; font-size:0.82rem; font-weight:600; color:#991b1b; }
+.unblock-btn {
+  padding:6px 14px; background:#e53e3e; color:#fff;
+  border:none; border-radius:8px;
+  font-family:'DM Sans',sans-serif; font-weight:700; font-size:0.78rem;
+  cursor:pointer; transition:all 0.2s; flex-shrink:0;
+}
+.unblock-btn:hover { background:#c53030; }
+
+/* Blocked input overlay */
+.blocked-input {
+  display:none; background:#fff5f5;
+  padding:14px 16px; flex-shrink:0;
+  border-top:1.5px solid #fecaca;
+  text-align:center;
+}
+.blocked-input.show { display:block; }
+.blocked-input p { font-size:0.85rem; color:#991b1b; font-weight:600; margin-bottom:8px; }
+.blocked-input button {
+  padding:8px 20px; background:#e53e3e; color:#fff;
+  border:none; border-radius:10px;
+  font-family:'DM Sans',sans-serif; font-weight:700; font-size:0.82rem;
+  cursor:pointer; transition:all 0.2s;
+}
+.blocked-input button:hover { background:#c53030; }
+
+/* Report modal specific */
+.report-reasons { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+.report-reason {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 14px; border:2px solid var(--border);
+  border-radius:13px; cursor:pointer; transition:all 0.2s;
+  background:var(--bg);
+}
+.report-reason:hover { border-color:var(--gold); background:#fffbeb; }
+.report-reason.selected { border-color:#e53e3e; background:#fff5f5; }
+.report-reason input[type=radio] { display:none; }
+.radio-box {
+  width:20px; height:20px; border-radius:50%;
+  border:2px solid var(--border); flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  transition:all 0.2s;
+}
+.report-reason.selected .radio-box { border-color:#e53e3e; background:#e53e3e; }
+.report-reason.selected .radio-box::after { content:''; width:8px; height:8px; background:#fff; border-radius:50%; display:block; }
+.report-label { font-size:0.88rem; font-weight:600; }
+.report-desc { font-size:0.75rem; color:var(--muted); }
+.report-textarea {
+  width:100%; padding:12px 14px;
+  border:2px solid var(--border); border-radius:13px;
+  font-family:'DM Sans',sans-serif; font-size:0.88rem;
+  color:var(--text); background:var(--bg); outline:none;
+  transition:all 0.2s; resize:none; height:80px;
+  margin-bottom:16px;
+}
+.report-textarea:focus { border-color:#e53e3e; background:#fff; }
+.btn-report {
+  width:100%; padding:13px; background:#e53e3e;
+  color:#fff; border:none; border-radius:14px;
+  font-family:'DM Sans',sans-serif; font-weight:700; font-size:0.95rem;
+  cursor:pointer; transition:all 0.2s;
+}
+.btn-report:hover { background:#c53030; transform:translateY(-1px); }
+
+/* Block confirm modal */
+.block-confirm-content { text-align:center; padding:8px 0; }
+.block-icon { font-size:3rem; margin-bottom:12px; }
+.block-name { font-weight:700; font-size:1rem; color:var(--text); margin-bottom:6px; }
+.block-note { font-size:0.82rem; color:var(--muted); line-height:1.6; margin-bottom:20px; }
+.block-note-item { display:flex; align-items:flex-start; gap:8px; text-align:left; margin-bottom:6px; font-size:0.82rem; color:var(--muted); }
+.btn-block-confirm {
+  width:100%; padding:13px; background:#e53e3e;
+  color:#fff; border:none; border-radius:14px;
+  font-family:'DM Sans',sans-serif; font-weight:700; font-size:0.95rem;
+  cursor:pointer; margin-bottom:10px; transition:all 0.2s;
+}
+.btn-block-confirm:hover { background:#c53030; }
+.btn-cancel-block {
+  width:100%; padding:11px; background:var(--bg);
+  color:var(--text); border:2px solid var(--border);
+  border-radius:14px; font-family:'DM Sans',sans-serif;
+  font-weight:700; font-size:0.9rem; cursor:pointer; transition:all 0.2s;
+}
+.btn-cancel-block:hover { border-color:var(--green); }
+
+/* BOTTOM NAV */
+.bottom-nav {
+  background:var(--white); border-top:1.5px solid var(--border);
+  display:flex; padding:8px 0 12px;
+  box-shadow:0 -4px 20px rgba(0,0,0,0.08); flex-shrink:0;
+}
+.bnav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; color:var(--muted); font-size:0.68rem; font-weight:600; transition:color 0.2s; }
+.bnav-item:hover, .bnav-item.active { color:var(--green); }
+.bnav-icon { font-size:1.3rem; }
+.bnav-add { width:48px; height:48px; background:linear-gradient(135deg,var(--green-dark),var(--green)); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:#fff; margin-top:-18px; box-shadow:0 4px 18px rgba(26,138,74,0.4); cursor:pointer; transition:all 0.2s; }
+.bnav-add:hover { transform:scale(1.08); }
+
+/* TOAST */
+.toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--green-dark); color:#fff; padding:11px 22px; border-radius:14px; font-weight:600; font-size:0.85rem; z-index:999; transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 8px 24px rgba(0,0,0,0.2); display:flex; align-items:center; gap:8px; }
+.toast.show { transform:translateX(-50%) translateY(0); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+</style>
+</head>
+<body>
+
+<!-- ===== CHAT LIST VIEW ===== -->
+<div class="view active" id="listView">
+  <div class="topbar">
+    <div class="logo">Xavfsiz Bozor</div>
+    <div style="flex:1; padding-left:12px;">
+      <div style="font-family:'Unbounded',sans-serif; font-size:0.95rem; font-weight:700; color:#fff;">Xabarlar</div>
+    </div>
+    <div class="topbar-icon" onclick="showToast('✏️ Yangi xabar')">✏️</div>
+  </div>
+
+  <div class="search-bar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" placeholder="Xabar yoki foydalanuvchi qidirish..." oninput="filterChats(this.value)">
+    </div>
+  </div>
+
+  <div class="chat-list" id="chatList"></div>
+
+  <div class="bottom-nav">
+    <div class="bnav-item" onclick="window.location.href='bozor-uz.html'"><div class="bnav-icon">🏪</div><div>Bozor</div></div>
+    <div class="bnav-item" onclick="window.location.href='bozor-qidiruv.html'"><div class="bnav-icon">🔍</div><div>Qidiruv</div></div>
+    <div class="bnav-item"><div class="bnav-add" onclick="showToast('➕ E\'lon')">➕</div><div>E'lon</div></div>
+    <div class="bnav-item active"><div class="bnav-icon">💬</div><div>Xabarlar</div></div>
+    <div class="bnav-item" onclick="window.location.href='bozor-profil.html'"><div class="bnav-icon">👤</div><div>Profil</div></div>
+  </div>
+</div>
+
+<!-- ===== CHAT VIEW ===== -->
+<div class="view" id="chatView">
+  <div class="chat-topbar">
+    <div class="back-btn" onclick="goBack()">←</div>
+    <div class="avatar-wrap">
+      <div class="topbar-avatar" id="chatAvatar">A</div>
+      <div class="online-dot" id="onlineDot"></div>
+    </div>
+    <div class="chat-user-info">
+      <div class="chat-user-name" id="chatName">—<span class="verified-mini">🛡️</span></div>
+      <div class="chat-user-status" id="chatStatus"><span class="online-status">● Online</span></div>
+    </div>
+    <div class="topbar-icon" onclick="showChatMenu()">⋮</div>
+  </div>
+
+  <!-- CHAT DROPDOWN MENU -->
+  <div class="chat-menu" id="chatMenu">
+    <div class="menu-item" onclick="muteChat()"><span class="menu-icon">🔕</span> Ovozni o'chirish</div>
+    <div class="menu-item" onclick="showToast('🔍 Xabarlarda qidirish')"><span class="menu-icon">🔍</span> Xabarlarda qidirish</div>
+    <div class="menu-divider"></div>
+    <div class="menu-item warning" onclick="openReportModal()"><span class="menu-icon">⚠️</span> Shikoyat qilish</div>
+    <div class="menu-item danger" id="blockMenuItem" onclick="openBlockModal()"><span class="menu-icon">🚫</span> Bloklash</div>
+  </div>
+
+  <!-- BLOCKED BANNER -->
+  <div class="blocked-banner" id="blockedBanner">
+    <span>🚫</span>
+    <span class="blocked-banner-text" id="blockedBannerText">Bu foydalanuvchini bloklagansiz</span>
+    <button class="unblock-btn" onclick="confirmUnblock()">Blokni ochish</button>
+  </div>
+
+  <div class="product-bar" id="productBar">
+    <div class="product-thumb" id="productThumb">📱</div>
+    <div class="product-info">
+      <div class="product-name" id="productName">—</div>
+      <div class="product-price" id="productPrice">—</div>
+    </div>
+    <button class="product-action" onclick="openOfferModal()">💰 Taklif</button>
+  </div>
+
+  <div class="messages-area" id="messagesArea">
+    <div class="typing-indicator" id="typingIndicator">
+      <div class="typing-bubble">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-area" id="normalInput">
+    <div class="quick-replies" id="quickReplies"></div>
+    <div class="input-row">
+      <div class="input-actions">
+        <div class="action-btn" onclick="showToast('📎 Fayl yuborish')">📎</div>
+        <div class="action-btn" onclick="showToast('📷 Rasm yuborish')">📷</div>
+      </div>
+      <div class="msg-input-wrap">
+        <textarea class="msg-input" id="msgInput" placeholder="Xabar yozing..." rows="1"
+          oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+      </div>
+      <button class="send-btn" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+
+  <!-- BLOCKED INPUT OVERLAY -->
+  <div class="blocked-input" id="blockedInput">
+    <p>🚫 Bu foydalanuvchini bloklagansiz. Xabar yubora olmaysiz.</p>
+    <button onclick="confirmUnblock()">🔓 Blokni ochish</button>
+  </div>
+</div>
+
+<!-- OFFER MODAL -->
+<div class="modal-overlay" id="offerModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">💰 Narx taklifi yuborish</div>
+    <div style="background:var(--bg); border-radius:12px; padding:12px; margin-bottom:16px; display:flex; align-items:center; gap:10px;">
+      <div id="modalProductThumb" style="font-size:1.8rem;">📱</div>
+      <div>
+        <div style="font-weight:700; font-size:0.88rem;" id="modalProductName">—</div>
+        <div style="color:var(--muted); font-size:0.78rem;">So'ralayotgan narx: <span id="modalAskPrice" style="color:var(--green); font-weight:700;">—</span></div>
+      </div>
+    </div>
+    <div class="price-input-wrap">
+      <input type="number" class="price-input" id="offerPrice" placeholder="0">
+      <span class="price-suffix">so'm</span>
+    </div>
+    <div class="offer-hint">💡 Sotuvchi sizning taklifingizni ko'radi va qabul qiladi yoki rad etadi.</div>
+    <button class="btn-send-offer" onclick="sendOffer()">📨 Taklif yuborish</button>
+  </div>
+</div>
+
+<!-- BLOCK CONFIRM MODAL -->
+<div class="modal-overlay" id="blockModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="block-confirm-content">
+      <div class="block-icon">🚫</div>
+      <div class="block-name" id="blockModalName">Foydalanuvchini bloklash</div>
+      <div style="margin:12px 0 16px;">
+        <div class="block-note-item">✅ Xabarlar o'chirilmaydi — tarix saqlanadi</div>
+        <div class="block-note-item">🚫 U sizga xabar yubora olmaydi</div>
+        <div class="block-note-item">👁️ U sizning e'lonlaringizni ko'ra olmaydi</div>
+        <div class="block-note-item">🔓 Istalgan vaqt blokni ochishingiz mumkin</div>
+      </div>
+      <button class="btn-block-confirm" onclick="doBlock()">🚫 Bloklash</button>
+      <button class="btn-cancel-block" onclick="closeBlockModal()">Bekor qilish</button>
+    </div>
+  </div>
+</div>
+
+<!-- UNBLOCK CONFIRM MODAL -->
+<div class="modal-overlay" id="unblockModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="block-confirm-content">
+      <div class="block-icon">🔓</div>
+      <div class="block-name" id="unblockModalName">Blokni ochish</div>
+      <div style="margin:12px 0 16px;">
+        <div class="block-note-item">💬 U yana sizga xabar yubora oladi</div>
+        <div class="block-note-item">👁️ U sizning e'lonlaringizni ko'ra oladi</div>
+        <div class="block-note-item">📋 Barcha xabarlar tarixi saqlanib qolgan</div>
+      </div>
+      <button class="btn-block-confirm" style="background:var(--green);" onclick="doUnblock()">🔓 Blokni ochish</button>
+      <button class="btn-cancel-block" onclick="closeUnblockModal()">Bekor qilish</button>
+    </div>
+  </div>
+</div>
+
+<!-- REPORT MODAL -->
+<div class="modal-overlay" id="reportModal">
+  <div class="modal" style="max-height:85vh; overflow-y:auto;">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚠️ Shikoyat qilish</div>
+    <div style="color:var(--muted); font-size:0.84rem; margin-bottom:16px;">Shikoyat sababini tanlang. Xabarlar o'chirilmaydi — moderatorlar ko'rib chiqadi.</div>
+    <div class="report-reasons" id="reportReasons">
+      <label class="report-reason" onclick="selectReason(this)">
+        <input type="radio" name="reason" value="spam">
+        <div class="radio-box"></div>
+        <div>
+          <div class="report-label">📢 Spam yoki reklama</div>
+          <div class="report-desc">Keraksiz xabarlar, reklama yuborilmoqda</div>
+        </div>
+      </label>
+      <label class="report-reason" onclick="selectReason(this)">
+        <input type="radio" name="reason" value="scam">
+        <div class="radio-box"></div>
+        <div>
+          <div class="report-label">💸 Firibgarlik (scam)</div>
+          <div class="report-desc">Pul yoki ma'lumot o'g'irlashga harakat</div>
+        </div>
+      </label>
+      <label class="report-reason" onclick="selectReason(this)">
+        <input type="radio" name="reason" value="fake">
+        <div class="radio-box"></div>
+        <div>
+          <div class="report-label">🎭 Soxta profil</div>
+          <div class="report-desc">Boshqa odamning nomi ostida harakat qilmoqda</div>
+        </div>
+      </label>
+      <label class="report-reason" onclick="selectReason(this)">
+        <input type="radio" name="reason" value="harass">
+        <div class="radio-box"></div>
+        <div>
+          <div class="report-label">😡 Bezovta qilish / tahdid</div>
+          <div class="report-desc">Haqorat, tahdid yoki xavfli xabarlar</div>
+        </div>
+      </label>
+      <label class="report-reason" onclick="selectReason(this)">
+        <input type="radio" name="reason" value="wrong">
+        <div class="radio-box"></div>
+        <div>
+          <div class="report-label">📦 Yolg'on mahsulot</div>
+          <div class="report-desc">E'londagi mahsulot haqiqatga mos emas</div>
+        </div>
+      </label>
+      <label class="report-reason" onclick="selectReason(this)">
+        <input type="radio" name="reason" value="other">
+        <div class="radio-box"></div>
+        <div>
+          <div class="report-label">📝 Boshqa sabab</div>
+          <div class="report-desc">Yuqoridagilar mos kelmaydi</div>
+        </div>
+      </label>
+    </div>
+    <textarea class="report-textarea" id="reportText" placeholder="Qo'shimcha izoh yozing (ixtiyoriy)..."></textarea>
+    <div style="background:#fff5f5; border:1.5px solid #fecaca; border-radius:12px; padding:12px; margin-bottom:16px; font-size:0.78rem; color:#991b1b; display:flex; gap:8px;">
+      <span>🔒</span>
+      <span>Shikoyatingiz anonim qoladi. Xabarlaringiz moderatorlarga ko'rinadi, lekin o'chirilmaydi.</span>
+    </div>
+    <button class="btn-report" id="reportSubmitBtn" onclick="submitReport()" disabled>⚠️ Shikoyat yuborish</button>
+    <button class="btn-cancel-block" style="margin-top:10px;" onclick="closeReportModal()">Bekor qilish</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script>
+// ===== DATA =====
+const chats = [
+  {
+    id:1, name:'Akbar A.', avatar:'A', color:'#1a8a4a',
+    online:true, verified:true,
+    product:'iPhone 14 Pro Max', productEmoji:'📱', productPrice:'8.5 mln so\'m',
+    lastMsg:'Yaxshi, holati qanday?', time:'Hozir', unread:2,
+    messages:[
+      {type:'in', text:'Salom! iPhone hali sotuvdami?', time:'10:22'},
+      {type:'out', text:'Ha, sotuvda! Qiziqyapsizmi?', time:'10:24', status:'read'},
+      {type:'in', text:'Ha albatta. Holati qanday?', time:'10:25'},
+      {type:'out', text:'A\'lo holat, hech qanday tirnoq yo\'q. Qutisi ham bor 📦', time:'10:26', status:'read'},
+      {type:'in', text:'Narxda kelishish mumkinmi?', time:'10:28'},
+      {type:'out', text:'Biroz muzokaraga boramiz. Qancha taklif qilasiz?', time:'10:29', status:'delivered'},
+      {type:'in', text:'Yaxshi, holati qanday?', time:'10:30'},
+    ]
+  },
+  {
+    id:2, name:'Nodira X.', avatar:'N', color:'#7c3aed',
+    online:false, verified:true,
+    product:'Zara kurtka (M)', productEmoji:'👗', productPrice:'450 ming so\'m',
+    lastMsg:'Menga mos keladi 🙂', time:'Kecha', unread:0,
+    messages:[
+      {type:'out', text:'Salom! Kurtka hali bormi?', time:'Kecha 14:10', status:'read'},
+      {type:'in', text:'Ha, bor! O\'lcham M, juda yaxshi holat', time:'Kecha 14:15'},
+      {type:'out', text:'Rangi rasmga mos keladimi? Ko\'k rang ko\'rinadi', time:'Kecha 14:17', status:'read'},
+      {type:'in', text:'Ha, to\'q ko\'k. Haqiqiy rang shu', time:'Kecha 14:20'},
+      {type:'out', text:'Toshkentga yetkazib bera olasizmi?', time:'Kecha 14:22', status:'read'},
+      {type:'in', text:'Menga mos keladi 🙂', time:'Kecha 14:25'},
+    ]
+  },
+  {
+    id:3, name:'Jasur M.', avatar:'J', color:'#dc2626',
+    online:true, verified:false,
+    product:'MacBook Air M2', productEmoji:'💻', productPrice:'14 mln so\'m',
+    lastMsg:'Siz: Holat haqida rasm bera olasizmi?', time:'Dushanba', unread:0,
+    messages:[
+      {type:'in', text:'Assalomu alaykum! MacBook hali sotuvdami?', time:'Dushanba 09:00'},
+      {type:'out', text:'Alaykum salom! Ha, sotuvda', time:'Dushanba 09:05', status:'read'},
+      {type:'in', text:'Narxda yanada pasayish bormiqin?', time:'Dushanba 09:10'},
+      {type:'out', text:'13.5 mlnga beraman, oxirgi narx', time:'Dushanba 09:12', status:'read'},
+      {type:'offer', price:'12,500,000', time:'Dushanba 09:15'},
+      {type:'out', text:'Holat haqida rasm bera olasizmi?', time:'Dushanba 09:20', status:'delivered'},
+    ]
+  },
+  {
+    id:4, name:'Malika T.', avatar:'M', color:'#0891b2',
+    online:false, verified:true,
+    product:'IKEA divan', productEmoji:'🛋️', productPrice:'1.2 mln so\'m',
+    lastMsg:'Ok, raqamingizni yuboring', time:'Shanba', unread:1,
+    messages:[
+      {type:'in', text:'Divan hali bormi?', time:'Shanba 11:00'},
+      {type:'out', text:'Ha! Ko\'rishni istaysizmi?', time:'Shanba 11:10', status:'read'},
+      {type:'in', text:'Ha, qachon qulay?', time:'Shanba 11:15'},
+      {type:'out', text:'Ertaga kechqurun 18:00 da?', time:'Shanba 11:20', status:'read'},
+      {type:'in', text:'Ok, raqamingizni yuboring', time:'Shanba 11:25'},
+    ]
+  },
+  {
+    id:5, name:'Bobur K.', avatar:'B', color:'#059669',
+    online:false, verified:true,
+    product:'Canon EOS R50', productEmoji:'📷', productPrice:'7.2 mln so\'m',
+    lastMsg:'Siz: Yaxshi, ko\'rishamiz!', time:'Juma', unread:0,
+    messages:[
+      {type:'in', text:'Kamera haqida so\'rasam maylimi?', time:'Juma 15:00'},
+      {type:'out', text:'Albatta! Nima so\'ramoqchisiz?', time:'Juma 15:05', status:'read'},
+      {type:'in', text:'Ob\'ektivlar bor-yo\'qligi', time:'Juma 15:10'},
+      {type:'out', text:'18-45mm kit ob\'ektiv bor. Qo\'shimcha 55-200mm ham beraman', time:'Juma 15:15', status:'read'},
+      {type:'in', text:'Ajoyib! Qachon ko\'rsak bo\'ladi?', time:'Juma 15:18'},
+      {type:'out', text:'Yaxshi, ko\'rishamiz!', time:'Juma 15:20', status:'read'},
+    ]
+  },
+];
+
+let currentChat = null;
+let typingTimeout = null;
+
+const quickRepliesData = [
+  'Salom! Hali sotuvdami?',
+  'Narxda kelishish mumkinmi?',
+  'Ko\'rishga bolamanmi?',
+  'Yetkazib bera olasizmi?',
+  'Holati qanday?',
+  'Telefon raqamingiz?',
+];
+
+// ===== RENDER CHAT LIST =====
+function renderChatList(filter='') {
+  const list = document.getElementById('chatList');
+  const filtered = chats.filter(c =>
+    c.name.toLowerCase().includes(filter.toLowerCase()) ||
+    c.product.toLowerCase().includes(filter.toLowerCase()) ||
+    c.lastMsg.toLowerCase().includes(filter.toLowerCase())
+  );
+
+  if (!filtered.length) {
+    list.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--muted);">
+      <div style="font-size:2.5rem;margin-bottom:12px;">🔍</div>
+      <div style="font-weight:700;margin-bottom:4px;">Hech narsa topilmadi</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(c => `
+    <div class="chat-item ${c.unread ? 'unread' : ''}" onclick="openChat(${c.id})">
+      <div class="ci-avatar" style="background:${c.color};">
+        ${c.avatar}
+        ${c.online ? '<div class="online-dot" style="position:absolute;bottom:1px;right:1px;width:11px;height:11px;background:#22c55e;border-radius:50%;border:2px solid #fff;"></div>' : ''}
+      </div>
+      <div class="ci-body">
+        <div class="ci-top">
+          <div class="ci-name">${c.name}${c.verified ? '<span class="verified-mini">🛡️</span>' : ''}</div>
+          <div class="ci-time">${c.time}</div>
+        </div>
+        <div class="ci-bottom">
+          <div class="ci-msg ${c.unread ? 'unread-msg' : ''}">${c.lastMsg}</div>
+          ${c.unread ? `<div class="unread-count">${c.unread}</div>` : ''}
+        </div>
+        <div class="ci-product">📦 ${c.product}${c.blocked ? ' <span style="color:#e53e3e;font-size:0.65rem;font-weight:800;margin-left:4px;">🚫 BLOKLANGAN</span>' : ''}${c.reported ? ' <span style="color:#d97706;font-size:0.65rem;font-weight:800;margin-left:4px;">⚠️ SHIKOYAT</span>' : ''}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterChats(val) { renderChatList(val); }
+
+// ===== OPEN CHAT =====
+function openChat(id) {
+  currentChat = chats.find(c => c.id === id);
+  if (!currentChat) return;
+
+  currentChat.unread = 0;
+  renderChatList();
+
+  document.getElementById('chatAvatar').textContent = currentChat.avatar;
+  document.getElementById('chatAvatar').style.background = currentChat.color;
+  document.getElementById('chatName').innerHTML = currentChat.name + (currentChat.verified ? '<span class="verified-mini">🛡️</span>' : '');
+  document.getElementById('chatStatus').innerHTML = currentChat.online
+    ? '<span class="online-status">● Online</span>'
+    : '<span style="color:rgba(255,255,255,0.5)">● Oxirgi faollik: bugun</span>';
+  document.getElementById('onlineDot').style.display = currentChat.online ? 'block' : 'none';
+
+  document.getElementById('productThumb').textContent = currentChat.productEmoji;
+  document.getElementById('productName').textContent = currentChat.product;
+  document.getElementById('productPrice').textContent = currentChat.productPrice;
+
+  document.getElementById('modalProductThumb').textContent = currentChat.productEmoji;
+  document.getElementById('modalProductName').textContent = currentChat.product;
+  document.getElementById('modalAskPrice').textContent = currentChat.productPrice;
+
+  renderMessages();
+  renderQuickReplies();
+
+  document.getElementById('listView').classList.remove('active');
+  document.getElementById('chatView').classList.add('active');
+
+  // Apply blocked state
+  updateBlockedUI();
+
+  setTimeout(() => scrollToBottom(), 100);
+}
+
+// ===== RENDER MESSAGES =====
+function renderMessages() {
+  const area = document.getElementById('messagesArea');
+  const typing = document.getElementById('typingIndicator');
+  area.innerHTML = '';
+  area.appendChild(typing);
+
+  let lastDate = '';
+  currentChat.messages.forEach((msg, i) => {
+    const dateStr = msg.time.includes('Kecha') ? 'Kecha' :
+                    msg.time.includes('Dushanba') ? 'Dushanba' :
+                    msg.time.includes('Shanba') ? 'Shanba' :
+                    msg.time.includes('Juma') ? 'Juma' : 'Bugun';
+
+    if (dateStr !== lastDate) {
+      lastDate = dateStr;
+      const divider = document.createElement('div');
+      divider.className = 'date-divider';
+      divider.innerHTML = `<span>${dateStr}</span>`;
+      area.insertBefore(divider, typing);
+    }
+
+    if (msg.type === 'offer') {
+      const el = document.createElement('div');
+      el.style.cssText = 'display:flex;justify-content:flex-start;margin-bottom:8px;';
+      el.innerHTML = `
+        <div class="msg-offer">
+          <div class="offer-title">💰 Narx taklifi</div>
+          <div class="offer-price">${msg.price} so'm</div>
+          <div class="offer-btns">
+            <button class="offer-accept" onclick="acceptOffer(this)">✅ Qabul qilish</button>
+            <button class="offer-decline" onclick="declineOffer(this)">❌ Rad etish</button>
+          </div>
+        </div>`;
+      area.insertBefore(el, typing);
+    } else {
+      const wrap = document.createElement('div');
+      wrap.className = `msg-wrap ${msg.type}`;
+      const statusIcon = msg.status === 'read' ? '<span class="msg-status read">✓✓</span>' :
+                         msg.status === 'delivered' ? '<span class="msg-status">✓✓</span>' :
+                         msg.status ? '<span class="msg-status">✓</span>' : '';
+      wrap.innerHTML = `
+        <div class="msg-bubble">${msg.text}</div>
+        <div class="msg-meta">
+          <span>${msg.time.replace('Kecha ','').replace('Dushanba ','').replace('Shanba ','').replace('Juma ','')}</span>
+          ${statusIcon}
+        </div>`;
+      area.insertBefore(wrap, typing);
+    }
+  });
+}
+
+// ===== QUICK REPLIES =====
+function renderQuickReplies() {
+  document.getElementById('quickReplies').innerHTML = quickRepliesData.map(q =>
+    `<button class="qr-btn" onclick="useQuickReply('${q}')">${q}</button>`
+  ).join('');
+}
+
+function useQuickReply(text) {
+  document.getElementById('msgInput').value = text;
+  autoResize(document.getElementById('msgInput'));
+  document.getElementById('msgInput').focus();
+}
+
+// ===== SEND MESSAGE =====
+function sendMessage() {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if (!text || !currentChat) return;
+
+  const now = new Date();
+  const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+
+  currentChat.messages.push({ type:'out', text, time, status:'sent' });
+  currentChat.lastMsg = 'Siz: ' + text;
+  currentChat.time = 'Hozir';
+
+  input.value = '';
+  input.style.height = '';
+  renderMessages();
+  renderChatList();
+  scrollToBottom();
+
+  // Simulate typing + reply
+  setTimeout(() => {
+    document.getElementById('typingIndicator').classList.add('show');
+    scrollToBottom();
+  }, 800);
+
+  setTimeout(() => {
+    document.getElementById('typingIndicator').classList.remove('show');
+    const replies = [
+      'Tushunaman, ko\'rib chiqaman 👍',
+      'Yaxshi savol! Biroz kuting...',
+      'Ha, albatta! Kelishildi.',
+      'Narx haqida bir oz o\'ylab ko\'raman',
+      'Rahmat xabar uchun!',
+      'Bugun qulay vaqt bormi ko\'rishga?',
+    ];
+    const reply = replies[Math.floor(Math.random()*replies.length)];
+    currentChat.messages.push({type:'in', text:reply, time});
+    currentChat.lastMsg = reply;
+    renderMessages();
+    renderChatList();
+    scrollToBottom();
+  }, 2500);
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = '';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+}
+
+function scrollToBottom() {
+  const area = document.getElementById('messagesArea');
+  area.scrollTop = area.scrollHeight;
+}
+
+// ===== OFFERS =====
+function openOfferModal() {
+  document.getElementById('offerModal').classList.add('open');
+}
+document.getElementById('offerModal').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('open');
+});
+
+function sendOffer() {
+  const price = document.getElementById('offerPrice').value;
+  if (!price) { showToast('⚠️ Narxni kiriting!'); return; }
+  document.getElementById('offerModal').classList.remove('open');
+
+  const formatted = parseInt(price).toLocaleString();
+  const now = new Date();
+  const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  currentChat.messages.push({type:'offer', price:formatted, time});
+  currentChat.lastMsg = '💰 Narx taklifi: ' + formatted + ' so\'m';
+  renderMessages();
+  renderChatList();
+  scrollToBottom();
+  showToast('💰 Taklif yuborildi!');
+
+  setTimeout(() => {
+    document.getElementById('typingIndicator').classList.add('show');
+    scrollToBottom();
+  }, 1000);
+  setTimeout(() => {
+    document.getElementById('typingIndicator').classList.remove('show');
+    currentChat.messages.push({type:'in', text:'Taklifingizni ko\'rdim, bir oz o\'ylab ko\'raman 🤔', time});
+    renderMessages();
+    renderChatList();
+    scrollToBottom();
+  }, 3000);
+}
+
+function acceptOffer(btn) {
+  btn.closest('.msg-offer').innerHTML = '<div style="color:var(--green);font-weight:700;font-size:0.9rem;">✅ Taklif qabul qilindi!</div>';
+  showToast('✅ Taklif qabul qilindi!');
+}
+function declineOffer(btn) {
+  btn.closest('.msg-offer').innerHTML = '<div style="color:#e53e3e;font-weight:700;font-size:0.9rem;">❌ Taklif rad etildi</div>';
+  showToast('❌ Taklif rad etildi');
+}
+
+// ===== NAVIGATION =====
+function goBack() {
+  document.getElementById('chatView').classList.remove('active');
+  document.getElementById('listView').classList.add('active');
+  currentChat = null;
+}
+
+// ===== CHAT MENU =====
+function showChatMenu() {
+  const menu = document.getElementById('chatMenu');
+  menu.classList.toggle('open');
+  // Update block menu item
+  const blockItem = document.getElementById('blockMenuItem');
+  if (currentChat && currentChat.blocked) {
+    blockItem.innerHTML = '<span class="menu-icon">🔓</span> Blokdan chiqarish';
+    blockItem.onclick = confirmUnblock;
+  } else {
+    blockItem.innerHTML = '<span class="menu-icon">🚫</span> Bloklash';
+    blockItem.onclick = openBlockModal;
+  }
+}
+
+// Close menu when clicking outside
+document.addEventListener('click', function(e) {
+  const menu = document.getElementById('chatMenu');
+  if (menu.classList.contains('open') && !e.target.closest('#chatMenu') && !e.target.closest('.topbar-icon')) {
+    menu.classList.remove('open');
+  }
+});
+
+function muteChat() {
+  document.getElementById('chatMenu').classList.remove('open');
+  if (!currentChat) return;
+  currentChat.muted = !currentChat.muted;
+  showToast(currentChat.muted ? '🔕 Ovoz o\'chirildi' : '🔔 Ovoz yoqildi');
+}
+
+// ===== BLOCK =====
+function openBlockModal() {
+  document.getElementById('chatMenu').classList.remove('open');
+  document.getElementById('blockModalName').textContent = (currentChat?.name || '') + ' ni bloklash';
+  document.getElementById('blockModal').classList.add('open');
+}
+function closeBlockModal() {
+  document.getElementById('blockModal').classList.remove('open');
+}
+document.getElementById('blockModal').addEventListener('click', function(e) {
+  if (e.target === this) closeBlockModal();
+});
+
+function doBlock() {
+  if (!currentChat) return;
+  currentChat.blocked = true;
+  closeBlockModal();
+  updateBlockedUI();
+  showToast('🚫 ' + currentChat.name + ' bloklandi. Xabarlar saqlanib qoldi.');
+}
+
+// ===== UNBLOCK =====
+function confirmUnblock() {
+  document.getElementById('chatMenu').classList.remove('open');
+  document.getElementById('unblockModalName').textContent = (currentChat?.name || '') + ' blokini ochish';
+  document.getElementById('unblockModal').classList.add('open');
+}
+function closeUnblockModal() {
+  document.getElementById('unblockModal').classList.remove('open');
+}
+document.getElementById('unblockModal').addEventListener('click', function(e) {
+  if (e.target === this) closeUnblockModal();
+});
+
+function doUnblock() {
+  if (!currentChat) return;
+  currentChat.blocked = false;
+  closeUnblockModal();
+  updateBlockedUI();
+  showToast('🔓 ' + currentChat.name + ' blokdan chiqarildi!');
+}
+
+function updateBlockedUI() {
+  const blocked = currentChat?.blocked;
+  document.getElementById('blockedBanner').classList.toggle('show', !!blocked);
+  document.getElementById('blockedBannerText').textContent =
+    blocked ? (currentChat.name + ' bloklanган — xabarlar saqlanib qolgan') : '';
+  document.getElementById('normalInput').style.display = blocked ? 'none' : '';
+  document.getElementById('blockedInput').classList.toggle('show', !!blocked);
+  // Update chat list (show blocked indicator)
+  renderChatList();
+}
+
+// ===== REPORT =====
+function openReportModal() {
+  document.getElementById('chatMenu').classList.remove('open');
+  // Reset
+  document.querySelectorAll('.report-reason').forEach(r => r.classList.remove('selected'));
+  document.getElementById('reportText').value = '';
+  document.getElementById('reportSubmitBtn').disabled = true;
+  document.getElementById('reportModal').classList.add('open');
+}
+function closeReportModal() {
+  document.getElementById('reportModal').classList.remove('open');
+}
+document.getElementById('reportModal').addEventListener('click', function(e) {
+  if (e.target === this) closeReportModal();
+});
+
+function selectReason(el) {
+  document.querySelectorAll('.report-reason').forEach(r => r.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('reportSubmitBtn').disabled = false;
+}
+
+function submitReport() {
+  const reason = document.querySelector('.report-reason.selected');
+  if (!reason) return;
+  closeReportModal();
+  showToast('✅ Shikoyat yuborildi. Moderator ko\'rib chiqadi.');
+  // Log report (in real app, send to server)
+  if (currentChat) {
+    currentChat.reported = true;
+    console.log('Report submitted for:', currentChat.name, 'Reason:', reason.querySelector('input').value);
+  }
+}
+
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ===== INIT =====
+renderChatList();
+</script>
+</body>
+</html>
